@@ -6,15 +6,16 @@
  */
 
 import React from 'react';
-import {SafeAreaView} from 'react-native';
+import {SafeAreaView, Text, View} from 'react-native';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import MotiSkeletonScreen from './app/screens/MotiSkeletonScreen';
 
 function App(): React.JSX.Element {
   return (
     <GestureHandlerRootView style={{flex: 1}}>
       <SafeAreaView>
-        <MotiSkeletonScreen />
+        <View>
+          <Text>Hello World</Text>
+        </View>
       </SafeAreaView>
     </GestureHandlerRootView>
   );
