@@ -2,6 +2,7 @@ import {
   Alert,
   Dimensions,
   Image,
+  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -11,16 +12,19 @@ import React, {useState} from 'react';
 import {Images} from '../../assets';
 import {MotiView, useDynamicAnimation, useAnimationState} from 'moti';
 
-const deviceWidth = Dimensions.get('window').width;
+const windowWidth = Dimensions.get('window').width
+const eachWidthNo = windowWidth/4
+
+const deviceWidth = eachWidthNo*4
 const deviceHeight = Dimensions.get('window').height;
 
 const useTranslateX = () => {
   return useAnimationState({
-    from: {translateX: 20},
-    to0: {translateX: 20},
+    from: {translateX: 0},
+    to0: {translateX: 0},
     to1: {translateX: deviceWidth / 4},
-    to2: {translateX: (deviceWidth / 4) * 2 - 10},
-    to3: {translateX: (deviceWidth / 4) * 3 - 30},
+    to2: {translateX: (deviceWidth / 4) * 2},
+    to3: {translateX: (deviceWidth / 4) * 3},
   });
 };
 const footerIconsArray = [Images.img1, Images.img2, Images.img3, Images.img4];
@@ -99,19 +103,23 @@ export default NavigationBar;
 
 const styles = StyleSheet.create({
   container: {
+    justifyContent: 'flex-end',
     height: '10%',
   },
   navBar: {
+
     borderTopRightRadius: 16,
     borderTopLeftRadius: 16,
     backgroundColor: '#212121',
     width: deviceWidth,
-    height: 76,
+    height: Platform.OS === 'android' ?  75 : 60,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-evenly',
   },
   pressable: {
+    paddingHorizontal: 20,
+    width: eachWidthNo,
     zIndex: 2,
     justifyContent: 'center',
     alignItems: 'center',
@@ -126,10 +134,11 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     position: 'absolute',
+
   },
   bgImage: {
-    width: 110,
-    height: 58,
+    width: eachWidthNo,
+    height: eachWidthNo/2 + 3,
   },
   imageCircle: {
     bottom: 10,
