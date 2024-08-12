@@ -6,74 +6,74 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
-  useDerivedValue,
   Easing,
   ReduceMotion,
-  withSpring,
   runOnJS,
+  useDerivedValue,
 } from 'react-native-reanimated';
 import {Images} from '../../assets';
-import {
-  Canvas,
-  LinearGradient,
-  RadialGradient,
-  Rect,
-  vec,
-} from '@shopify/react-native-skia';
-import {opacity} from 'react-native-reanimated/lib/typescript/reanimated2/Colors';
+import {Canvas, RadialGradient, Rect, vec} from '@shopify/react-native-skia';
 
-const width = Dimensions.get('screen').width;
-const height = Dimensions.get('screen').height;
+const {width, height} = Dimensions.get('screen');
 const screenCount = 3;
 const totalScreens = screenCount + 2; // Total screens including duplicates
 
-const Screen = ({ bottleImage, backgroundImage, text}) => {
-  return (
-    <View style={[styles.screen]}>
-      <MotiView
-        animate={{
-          scale: [1, 0.9, 0.8, 0.9, 1], // scale to 0, 1.1, then 1 (with delay 200 ms)
-        }}
-        transition={{
-          type: 'spring',
-          stiffness: 150,
-          damping: 10,
-        }}
-        style={{bottom: 0, position: 'absolute', width: 450, height: 660}}>
-        <Image
-          resizeMode="contain"
-          style={{bottom: 0, position: 'absolute', width: 450, height: 660}}
-          source={bottleImage}
-        />
-      </MotiView>
+const BottleImage = ({bottleImage}: any) => (
+  <MotiView
+    animate={{
+      scale: [1, 0.9, 0.8, 0.9, 1],
+    }}
+    transition={{
+      type: 'spring',
+      stiffness: 150,
+      damping: 10,
+    }}
+    style={styles.bottleImage}>
+    <Image
+      resizeMode="contain"
+      style={styles.bottleImage}
+      source={bottleImage}
+    />
+  </MotiView>
+);
 
-      <MotiView
-        from={{
-          scale: 1.1,
-        }}
-        animate={{
-          scale: [1.1, {value: 0, delay: 500}], // scale to 0, 1.1, then 1 (with delay 200 ms)
-        }}
-        transition={{
-          type: 'spring',
-          stiffness: 150,
-          damping: 10,
-        }}
-        style={{
-          position: 'absolute',
-          bottom: 0,
-          width: 450,
-          height: height,
-        }}>
-        <Image
-          resizeMode="contain"
-          style={{width: '100%', height: '100%'}}
-          source={backgroundImage}
-        />
-      </MotiView>
-    </View>
-  );
-};
+const BackgroundImage = ({backgroundImage}: any) => (
+  <MotiView
+    from={{scale: 1.1}}
+    animate={{scale: [1.1, {value: 0, delay: 500}]}}
+    transition={{
+      type: 'spring',
+      stiffness: 150,
+      damping: 10,
+    }}
+    style={styles.backgroundImage}>
+    <Image
+      resizeMode="contain"
+      style={styles.fullSize}
+      source={backgroundImage}
+    />
+  </MotiView>
+);
+
+const Screen = ({bottleImage, backgroundImage}: any) => (
+  <View style={styles.screen}>
+    <BottleImage bottleImage={bottleImage} />
+    <BackgroundImage backgroundImage={backgroundImage} />
+  </View>
+);
+
+const FruitIcon = ({imageSource, isActive}: any) => (
+  <MotiView
+    from={{scale: 1}}
+    animate={{
+      borderWidth: isActive ? 2 : 0,
+      borderColor: 'white',
+      borderRadius: 22,
+      scale: isActive ? 2 : 1,
+    }}>
+    <Image resizeMode="contain" style={styles.fruitIcon} source={imageSource} />
+  </MotiView>
+);
 
 const SwipeableScreen = () => {
   const translateX = useSharedValue(-width);
@@ -83,9 +83,7 @@ const SwipeableScreen = () => {
   const rightColor = useSharedValue('#FFB930');
   const [currentScreen, setCurrentScreen] = useState(0);
 
-  const colors = useDerivedValue(() => {
-    return [leftColor.value, rightColor.value];
-  }, []);
+  const colors = useDerivedValue(() => [leftColor.value, rightColor.value], []);
 
   const onDrag = Gesture.Pan()
     .onStart(() => {
@@ -108,177 +106,68 @@ const SwipeableScreen = () => {
         translateX.value = withTiming(-width * (newIndex + 1), {duration: 300});
       }
 
-      if (newIndex === 0) {
-        leftColor.value = withTiming('#FFEE57', {
-          duration: 1000,
-          easing: Easing.inOut(Easing.quad),
-          reduceMotion: ReduceMotion.System,
-        });
-        rightColor.value = withTiming('#FFB930', {
-          duration: 1000,
-          easing: Easing.inOut(Easing.quad),
-          reduceMotion: ReduceMotion.System,
-        });
-      } else if (newIndex === 1) {
-        leftColor.value = withTiming('#BCDB4E', {
-          duration: 1000,
-          easing: Easing.inOut(Easing.quad),
-          reduceMotion: ReduceMotion.System,
-        });
-        rightColor.value = withTiming('#8EC648', {
-          duration: 1000,
-          easing: Easing.inOut(Easing.quad),
-          reduceMotion: ReduceMotion.System,
-        });
-      } else {
-        leftColor.value = withTiming('#AE4EDB', {
-          duration: 1000,
-          easing: Easing.inOut(Easing.quad),
-          reduceMotion: ReduceMotion.System,
-        });
-        rightColor.value = withTiming('#6848C6', {
-          duration: 1000,
-          easing: Easing.inOut(Easing.quad),
-          reduceMotion: ReduceMotion.System,
-        });
-      }
+      const colorMap = [
+        {left: '#FFEE57', right: '#FFB930'},
+        {left: '#BCDB4E', right: '#8EC648'},
+        {left: '#AE4EDB', right: '#6848C6'},
+      ];
+
+      leftColor.value = withTiming(colorMap[newIndex].left, {
+        duration: 1000,
+        easing: Easing.inOut(Easing.quad),
+        reduceMotion: ReduceMotion.System,
+      });
+      rightColor.value = withTiming(colorMap[newIndex].right, {
+        duration: 1000,
+        easing: Easing.inOut(Easing.quad),
+        reduceMotion: ReduceMotion.System,
+      });
+
       runOnJS(setCurrentScreen)(newIndex);
       currentIndex.value = newIndex;
     });
 
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{translateX: translateX.value}],
-    };
-  });
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{translateX: translateX.value}],
+  }));
 
   return (
     <>
-      <Canvas style={{position: 'absolute', height: height, width: '100%'}}>
+      <Canvas style={styles.absoluteFull}>
         <Rect x={0} y={0} width={width} height={height}>
           <RadialGradient
             c={vec(width / 2, height / 2)}
             r={width}
-            // start={vec(0, 0)}
-            // end={vec(width, height)}
             colors={colors}
           />
         </Rect>
       </Canvas>
       <GestureDetector gesture={onDrag}>
         <Animated.View style={[styles.container, animatedStyle]}>
-          <Screen
-            bottleImage={Images.bottle3}
-            backgroundImage={Images.bg_3}
-            text="Screen 3"
-          />
-          <Screen
-          
-            bottleImage={Images.bottle1}
-            backgroundImage={Images.bg_1}
-            text="Screen 1"
-          />
-          <Screen
-          
-            bottleImage={Images.bottle2}
-            backgroundImage={Images.bg_2}
-            text="Screen 2"
-          />
-          <Screen
-            bottleImage={Images.bottle3}
-            backgroundImage={Images.bg_3}
-            text="Screen 3"
-          />
-          <Screen
-            bottleImage={Images.bottle1}
-            backgroundImage={Images.bg_1}
-            text="Screen 1"
-          />
+          <Screen bottleImage={Images.bottle3} backgroundImage={Images.bg_3} />
+          <Screen bottleImage={Images.bottle1} backgroundImage={Images.bg_1} />
+          <Screen bottleImage={Images.bottle2} backgroundImage={Images.bg_2} />
+          <Screen bottleImage={Images.bottle3} backgroundImage={Images.bg_3} />
+          <Screen bottleImage={Images.bottle1} backgroundImage={Images.bg_1} />
         </Animated.View>
       </GestureDetector>
-      <View
-        style={{
-          height: 52,
-          position: 'absolute',
-          top: '10%',
-          left: 0,
-          right: 0,
-          alignItems: 'center',
-        }}>
-        <Image
-          resizeMode="contain"
-          style={{height: '100%', width: 180}}
-          source={Images.logo}
-        />
+      <View style={styles.logoContainer}>
+        <Image resizeMode="contain" style={styles.logo} source={Images.logo} />
       </View>
-
-      <View
-        style={{
-          height: 52,
-          position: 'absolute',
-          top: '85%',
-          left: 0,
-          right: 0,
-          alignItems: 'center',
-        }}>
-        <View
-          style={{
-            width: 180,
-            height: '100%',
-            justifyContent: 'space-between',
-            flexDirection: 'row',
-            alignItems: 'center',
-          }}>
-          <MotiView
-          //style={{backgroundColor: 'red'}}
-            from={{
-
-              scale: 1,
-            }}
-            animate={{
-              borderWidth: currentScreen === 0 ? 2: 0,
-              borderColor: 'white',
-              borderRadius: 22,
-              scale: currentScreen === 0 ? 2 : 1,
-            }}>
-            <Image
-              resizeMode="contain"
-              style={{ height: 22 , width: 22}}
-              source={Images.fruit_1}
-            />
-          </MotiView>
-          <MotiView
-            from={{
-              scale: 1,
-            }}
-            animate={{
-              borderWidth: currentScreen === 1 ? 2: 0,
-              borderColor: 'white',
-              borderRadius: 22,
-              scale: currentScreen === 1 ? 2 : 1,
-            }}>
-          <Image
-            resizeMode="contain"
-            style={{ height: 22 , width: 22}}
-            source={Images.fruit_2}
+      <View style={styles.fruitContainer}>
+        <View style={styles.fruitRow}>
+          <FruitIcon
+            imageSource={Images.fruit_1}
+            isActive={currentScreen === 0}
           />
-          </MotiView>
-          <MotiView
-            from={{
-              scale: 1,
-            }}
-            animate={{
-              borderWidth: currentScreen === 2 ? 2: 0,
-              borderColor: 'white',
-              borderRadius: 22,
-              scale: currentScreen === 2 ? 2 : 1,
-            }}>
-          <Image
-            resizeMode="contain"
-            style={{ height: 22 , width: 22}}
-            source={Images.fruit_3}
+          <FruitIcon
+            imageSource={Images.fruit_2}
+            isActive={currentScreen === 1}
           />
-          </MotiView>
+          <FruitIcon
+            imageSource={Images.fruit_3}
+            isActive={currentScreen === 2}
+          />
         </View>
       </View>
     </>
@@ -289,16 +178,64 @@ const styles = StyleSheet.create({
   container: {
     height: '100%',
     flexDirection: 'row',
-    width: width * totalScreens, // Width for five screens
+    width: width * totalScreens,
   },
   screen: {
     width: width,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  text: {
-    color: 'black',
-    fontSize: 18,
+  bottleImage: {
+    bottom: 0,
+    position: 'absolute',
+    width: 450,
+    height: 660,
+  },
+  backgroundImage: {
+    position: 'absolute',
+    bottom: 0,
+    width: 450,
+    height: height,
+  },
+  fullSize: {
+    width: '100%',
+    height: '100%',
+  },
+  logoContainer: {
+    height: 52,
+    position: 'absolute',
+    top: '10%',
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+  },
+  logo: {
+    height: '100%',
+    width: 180,
+  },
+  fruitContainer: {
+    height: 52,
+    position: 'absolute',
+    top: '85%',
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+  },
+  fruitRow: {
+    width: 180,
+    height: '100%',
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  fruitIcon: {
+    height: 22,
+    width: 22,
+  },
+  absoluteFull: {
+    position: 'absolute',
+    height: height,
+    width: '100%',
   },
 });
 
