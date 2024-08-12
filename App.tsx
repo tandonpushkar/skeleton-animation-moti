@@ -6,19 +6,27 @@
  */
 
 import React from 'react';
-import {SafeAreaView, Text, View} from 'react-native';
-import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import {SafeAreaView, StyleSheet, Text, View} from 'react-native';
+import {GestureHandlerRootView, Swipeable} from 'react-native-gesture-handler';
+import SwipeableScreen from './app/screens/SwipeableScreen';
 
 function App(): React.JSX.Element {
   return (
     <GestureHandlerRootView style={{flex: 1}}>
-      <SafeAreaView>
+
         <View>
-          <Text>Hello World</Text>
+         <SwipeableScreen/>
         </View>
-      </SafeAreaView>
+
     </GestureHandlerRootView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'white',
+  },
+});
 
 export default App;
