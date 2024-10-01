@@ -6,15 +6,19 @@
  */
 
 import React from 'react';
-import {SafeAreaView, StyleSheet} from 'react-native';
+import {SafeAreaView, StyleSheet, StatusBar, View} from 'react-native';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import SnakeGame from './app/screens/SnakeGame';
+import SearchBar from './app/components/SearchBar';
 
 function App(): React.JSX.Element {
   return (
     <GestureHandlerRootView style={styles.root}>
+      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
       <SafeAreaView style={styles.container}>
-        <SnakeGame />
+        <View style={{marginTop: 30}}>
+        <SearchBar />
+        </View>
+       
       </SafeAreaView>
     </GestureHandlerRootView>
   );
@@ -26,7 +30,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#ffffff', 
   },
 });
 
